@@ -25,17 +25,18 @@ class Strategy(object):
             self.is_json_loaded = True
 
     def decide(self, state):
-        self.__seeded_strategy(state)
+        old_time = time.time()
+        self.__seeded_strategy(state, old_time)
 
-    def __seeded_strategy(self, state): 
+    def __seeded_strategy(self, state, old_time): 
         if self.__able_to_play_a_card(state) and self.is_json_loaded:
             flags = self.__unclaimed_minus_full_flags(state)
-            playFlag,playCard = self.__get_card_and_flag_for_play(flags, state)
+            playFlag,playCard = self.__get_card_and_flag_for_play(flags, state, old_time)
             state.reply = self.__reply_text(playFlag, playCard)
         else:
             self.__no_moves(state)
 
-    def __get_card_and_flag_for_play(self, flags, state):
+    def __get_card_and_flag_for_play(self, flags, state, old_time):
         flag_to_play = 1
         max_win_prob = 0
         card_to_play = (0,"color1")
@@ -52,6 +53,8 @@ class Strategy(object):
                 if len(already_on_flag) == 2:
                     my_combos = list(itertools.combinations([tuple(card_in_hand)],1))
                 for combo in my_combos:
+                    if time.time() - old_time > 7:
+                        return flag_to_play,card_to_play
                     cards_already_owned = 0
                     if len(already_on_flag) < 2:
                         tempList = [tuple(card_in_hand)]
