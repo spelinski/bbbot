@@ -21,8 +21,8 @@ class Strategy(object):
     def __load_json_file(self):
         with open('seed.txt') as json_data:
             seeded_data = json.load(json_data)
-        self.seeded_json = seeded_data
-        self.is_json_loaded = True
+            self.seeded_json = seeded_data
+            self.is_json_loaded = True
 
     def decide(self, state):
         self.__seeded_strategy(state)
