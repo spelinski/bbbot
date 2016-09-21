@@ -1,7 +1,6 @@
 from model.Card import Card
 from model.State import State
 from strategy.Strategy import Strategy
-import time
 
 class Parser(object):
 
