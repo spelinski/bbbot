@@ -2,22 +2,40 @@ from random import shuffle
 import itertools
 from model.Flags import Flags
 from model.Card import Card
+import threading
+import json
+import time
 
 
 class Strategy(object):
 
-    def __init__(self, seeded_json):
-        self.seeded_json = seeded_json
+    def __init__(self):
+        self.seeded_json = None
+        self.is_json_loaded = False
+        self.start_json_thread()
+
+    def start_json_thread(self):
+        thread = threading.Thread(target=self.__load_json_file)
+        thread.daemon = True
+        thread.start()
+
+    def __load_json_file(self):
+        with open('seed.txt') as json_data:
+            seeded_data = json.load(json_data)
+        self.seeded_json = seeded_data
+        self.is_json_loaded = True
 
     def decide(self, state):
         self.__seeded_strategy(state)
 
     def __seeded_strategy(self, state): 
-        if self.__able_to_play_a_card(state):
+        if self.__able_to_play_a_card(state) and self.is_json_loaded:
             flags = self.__unclaimed_minus_full_flags(state)
             playFlag,playCard = self.__get_card_and_flag_for_play(flags, state)
             state.reply = self.__reply_text(playFlag, playCard)
         else:
+            if not self.is_json_loaded:
+                time.sleep(5)
             self.__no_moves(state)
 
     def __get_card_and_flag_for_play(self, flags, state):

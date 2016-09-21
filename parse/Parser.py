@@ -1,14 +1,13 @@
 from model.Card import Card
 from model.State import State
 from strategy.Strategy import Strategy
-
+import time
 
 class Parser(object):
 
-    def __init__(self, seeded_json):
+    def __init__(self, ):
         self.state = State()
-        self.strategy = Strategy(seeded_json)
-        self.seeded_json = seeded_json
+        self.strategy = Strategy()
 
     def process(self, message):
         return self.__needs_reply(message)
@@ -44,6 +43,8 @@ class Parser(object):
         return message.split()[0] == 'player' and message.split()[2] == 'name'
 
     def __reply_to_name_request(self, message):
+        if not self.strategy.is_json_loaded:
+            time.sleep(5)
         self.state.seat = message.split()[1]
         self.state.reply = 'player {} {}'.format(
             message.split()[1], State.NAME)
@@ -56,10 +57,6 @@ class Parser(object):
         self.state.hand = [Card().text_to_card(card)
                            for card in message.split()[3:]]
         self.state.remove_cards_from_deck(self.state.hand)
-
-        #print self.state.hand
-        #formationList = (self.state.hand[0],self.state.hand[1],self.state.hand[2])
-        #print self.seeded_json["valid_formations"][str(formationList)]
         return False
 
     def __is_colors_message(self, message):

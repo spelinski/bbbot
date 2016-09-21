@@ -1,4 +1,3 @@
-import json
 from datetime import datetime
 from sys import stdin, stdout
 from parse.Parser import Parser
@@ -6,9 +5,8 @@ from parse.Parser import Parser
 
 class Bot(object):
 
-    def __init__(self, seeded_json):
-        self.seeded_json = seeded_json
-        self.parser = Parser(seeded_json)
+    def __init__(self):
+        self.parser = Parser()
 
     def run(self):
         while not stdin.closed:
@@ -29,10 +27,4 @@ class Bot(object):
         stdout.flush()
 
 if __name__ == '__main__':
-    with open('seed.txt') as json_data:
-        #print json_data
-        start_time = datetime.now()
-        seeded_data = json.load(json_data)
-        end_time = datetime.now()
-        #print ("time diff: " + str(end_time-start_time))
-    Bot(seeded_data).run()
+    Bot().run()
