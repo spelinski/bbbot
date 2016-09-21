@@ -35,7 +35,7 @@ class Strategy(object):
             state.reply = self.__reply_text(playFlag, playCard)
         else:
             if not self.is_json_loaded:
-                time.sleep(5)
+                time.sleep(1)
             self.__no_moves(state)
 
     def __get_card_and_flag_for_play(self, flags, state):
