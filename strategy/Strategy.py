@@ -54,8 +54,6 @@ class Strategy(object):
                 if len(already_on_flag) == 2:
                     my_combos = list(itertools.combinations([tuple(card_in_hand)],1))
                 for combo in my_combos:
-                    if time.time() - old_time > 7:
-                        return flag_to_play,card_to_play
                     cards_already_owned = 0
                     if len(already_on_flag) < 2:
                         tempList = [tuple(card_in_hand)]
