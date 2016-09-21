@@ -44,7 +44,7 @@ class Parser(object):
 
     def __reply_to_name_request(self, message):
         if not self.strategy.is_json_loaded:
-            time.sleep(5)
+            time.sleep(1)
         self.state.seat = message.split()[1]
         self.state.reply = 'player {} {}'.format(
             message.split()[1], State.NAME)
