@@ -4,6 +4,7 @@ from model.Flags import Flags
 from model.Card import Card
 import threading
 import json
+import time
 
 
 class Strategy(object):
