@@ -31,6 +31,23 @@ class Strategy(object):
         playFlag,playCard = self.__get_card_and_flag_for_play(flags, state)
         state.reply = self.__reply_text(playFlag, playCard)
 
+    def __get_opponent_best_win_prob(self,opponent_on_flag,state):
+        max_win_prob = 0
+        my_combos = list(itertools.combinations(state.deck,(3-len(opponent_on_flag))))
+
+        for combo in my_combos:
+            for on_flag_card in opponent_on_flag:
+                combo = list(combo)
+                combo.append(on_flag_card)
+                combo = tuple(combo)
+            combo = self.sort_cards(combo)
+            win_prob = self.seeded_json["valid_formations"][str(combo)]["win_chance"]
+
+            if win_prob > max_win_prob:
+                max_win_prob = win_prob
+        return max_win_prob
+
+
     def __get_card_and_flag_for_play(self, flags, state):
         flag_to_play = 1
         max_win_prob = 0
@@ -38,8 +55,12 @@ class Strategy(object):
         for flag in flags:
             if state.seat == "north":
                 already_on_flag = state.flags.north[flag-1]
+                already_on_flag_opponent = state.flags.south[flag-1]
             else :
                 already_on_flag = state.flags.south[flag-1]
+                already_on_flag_opponent = state.flags.north[flag-1]
+
+            opponent_win_prob = self.__get_opponent_best_win_prob(already_on_flag_opponent,state)
 
             if len(already_on_flag) < 2:
                 my_combos = list(itertools.combinations(state.deck,(2-len(already_on_flag))))
@@ -48,36 +69,40 @@ class Strategy(object):
                 if len(already_on_flag) == 2:
                     my_combos = list(itertools.combinations([tuple(card_in_hand)],1))
                 for combo in my_combos:
-                    cards_already_owned = 0
+                    #cards_already_owned = 0
                     if len(already_on_flag) < 2:
                         tempList = [tuple(card_in_hand)]
                         for temp_card in combo:
                             tempList.append(temp_card)
                         combo = tuple(tempList)
 
-                    probability_to_get_combo = 0
+                    #probability_to_get_combo = 0
                     
-                    for combo_card in combo:
+                    '''for combo_card in combo:
                         for hand_card in state.hand:
                             if combo_card == hand_card:
-                                cards_already_owned += 1
+                                cards_already_owned += 1'''
 
                     for on_flag_card in already_on_flag:
                         combo = list(combo)
                         combo.append(on_flag_card)
                         combo = tuple(combo)
-                        cards_already_owned += 1
+                        #cards_already_owned += 1
                     old_combo = combo
                     combo = self.sort_cards(combo)
 
-                    if cards_already_owned == 3:
+                    '''if cards_already_owned == 3:
                         probability_to_get_combo = 1
                     elif cards_already_owned == 2:
                         probability_to_get_combo = 1.0 * 1.0 * (1.0/len(state.deck))
                     elif cards_already_owned == 1:
-                        probability_to_get_combo = 1.0 * (1.0/len(state.deck)) * (1.0/(len(state.deck)-1))
+                        probability_to_get_combo = 1.0 * (1.0/len(state.deck)) * (1.0/(len(state.deck)-1))'''
 
-                    win_prob = self.seeded_json["valid_formations"][str(combo)]["win_chance"] * probability_to_get_combo
+                    win_prob = self.seeded_json["valid_formations"][str(combo)]["win_chance"]
+                    #* probability_to_get_combo
+
+                    if win_prob > opponent_win_prob:
+                        return flag,old_combo[0]
 
                     if win_prob > max_win_prob:
                         flag_to_play = flag
